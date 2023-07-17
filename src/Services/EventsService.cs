@@ -40,20 +40,26 @@ public class EventsService : IEventsService
     {
         // The channel pool will be updated a lot less frequently than the message pool,
         // so this should usually already be there.
-        if (await channel.GetOrDownloadAsync() is not IGuildChannel guildChannel)
+        if (await channel.GetOrDownloadAsync() is not IThreadChannel threadChannel)
         {
             // Nothing to do here
+            return;
+        }
+
+        // Check whether the person who reacted was the OP
+        if (reaction.UserId != threadChannel.OwnerId)
+        {
             return;
         }
 
         // Check if it's the pin/unpin emoji
         var shouldPin = await _emojiService.IsPinReaction(
             reaction.Emote,
-            guildChannel.GuildId
+            threadChannel.GuildId
         );
         if (!(
             shouldPin
-            || await _emojiService.IsUnpinReaction(reaction.Emote, guildChannel.GuildId)
+            || await _emojiService.IsUnpinReaction(reaction.Emote, threadChannel.GuildId)
         ))
         {
             return;
