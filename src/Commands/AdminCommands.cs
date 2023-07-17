@@ -1,28 +1,26 @@
 using Discord;
 using Discord.Interactions;
+using PinBot.Attributes;
 using PinBot.Models;
 using PinBot.Repositories;
 using PinBot.Util;
 
 namespace PinBot.Commands;
 
-[RequireOwner]
+[Admin]
 [Group("admin", "Commands for bot admins only")]
 public class AdminCommands : InteractionModuleBase
 {
     private readonly ILogger _logger;
     private readonly IEventChannelRepository _repo;
-    private readonly AppConfig _config;
 
     public AdminCommands(
         ILogger<AdminCommands> logger,
-        IEventChannelRepository repo,
-        AppConfig config
+        IEventChannelRepository repo
     )
     {
         _logger = logger;
         _repo = repo;
-        _config = config;
     }
 
     [SlashCommand("setchannel", "Set the channel for an event.")]
