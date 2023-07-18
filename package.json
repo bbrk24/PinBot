@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "pg": "^8.11.1",
+    "postgrator-cli": "^7.0.0"
+  },
+  "scripts": {
+    "migrations": "postgrator -c migrations.json"
+  }
+}
