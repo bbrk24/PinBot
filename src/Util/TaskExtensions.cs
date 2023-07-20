@@ -42,8 +42,14 @@ public static class TaskExtensions
         });
         var baseAndCancelTask = Task.Run(async () =>
         {
-            await baseTask;
-            source.Cancel();
+            try
+            {
+                await baseTask;
+            }
+            finally
+            {
+                source.Cancel();
+            }
         });
 
         await Task.WhenAll(baseAndCancelTask, deferTask);

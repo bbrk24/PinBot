@@ -4,13 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PinBot.Models;
 
-public enum Setting
-{
-    PinEmoji,
-    UnpinEmoji,
-    ForumsOnly,
-}
-
 public class ServerSettings : IEntity<long>
 {
     public long Id { get; set; }
