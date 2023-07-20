@@ -29,14 +29,16 @@ public class MessageService: IMessageService
 
     public async Task SendMessageForEvent(string message, EventName eventName)
     {
-        var eventChannel = await _eventChannelRepo.GetChannelForEventAsync(eventName);
+        var eventChannel = await _eventChannelRepo.GetChannelForEventAsync(eventName)
+            .ConfigureAwait(false);
         if (eventChannel is null)
         {
             _logger.LogInformation("Could not find channel for event {0}", eventName);
             return;
         }
 
-        var channel = await _client.GetChannelAsync((ulong)eventChannel.Channel);
+        var channel = await _client.GetChannelAsync((ulong)eventChannel.Channel)
+            .ConfigureAwait(false);
 
         if (channel is null)
         {
@@ -71,7 +73,7 @@ public class MessageService: IMessageService
         {
             _logger.LogError(
                 e,
-                "Error sending message to channel {0} (for event {1}",
+                "Error sending message to channel {0} (for event {1})",
                 channel,
                 eventName
             );

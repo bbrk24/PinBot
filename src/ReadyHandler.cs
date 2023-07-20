@@ -42,7 +42,8 @@ public class ReadyHandler : IReadyHandler
 
     private async Task RegisterCommands()
     {
-        await _commandsService.RegisterCommandsAsync();
+        await _commandsService.RegisterCommandsAsync()
+            .ConfigureAwait(false);
         _client.InteractionCreated += _commandsService.ReceiveInteractionAsync;
     }
 }
