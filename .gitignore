@@ -1,6 +1,7 @@
 bin/
 obj/
 .vs/
+.vscode/
 **/Properties/launchSettings.json
 node_modules/
 migrations.json

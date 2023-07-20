@@ -1,0 +1,5 @@
+# Most things are LF...
+* text=auto eol=lf
+# ...except project and solution files, which are CRLF
+*.csproj eol=crlf
+*.sln    eol=crlf

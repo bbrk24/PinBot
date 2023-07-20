@@ -21,7 +21,10 @@ services.AddGeneralServices();
 
 services.AddSingleton(client);
 
+#pragma warning disable ASP0000
+// How else do I get one, pray tell?
 var serviceProvider = services.BuildServiceProvider();
+#pragma warning restore
 
 var config = serviceProvider.GetRequiredService<AppConfig>();
 var loggingService = serviceProvider.GetRequiredService<ILoggingService>();
@@ -35,4 +38,11 @@ client.ReactionAdded += eventsService.ReactionAdd;
 
 await client.LoginAsync(TokenType.Bot, config.Token);
 await client.StartAsync();
-await Task.Delay(-1);
+
+// Start Roomba'ing
+var roombaService = serviceProvider.GetRequiredService<IRoombaService>();
+while (true)
+{
+    await roombaService.RunAllRoombasAsync();
+    await Task.Delay(TimeSpan.FromDays(30));
+}

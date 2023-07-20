@@ -1,6 +1,5 @@
 using Discord;
 using Discord.WebSocket;
-using Microsoft.Extensions.Logging;
 using PinBot.Repositories;
 using PinBot.Models;
 

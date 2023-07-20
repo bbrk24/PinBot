@@ -70,6 +70,9 @@ public static class Setup
     public static void AddRepositories(this IServiceCollection builder)
     {
         builder.AddScoped<IEventChannelRepository, EventChannelRepository>();
+        builder.AddScoped<IServerSettingsRepository, ServerSettingsRepository>();
+
+        builder.AddScoped<IRoomba, ServerSettingsRepository>();
     }
 
     public static void AddGeneralServices(this IServiceCollection builder)
@@ -79,5 +82,6 @@ public static class Setup
         builder.AddScoped<IReadyHandler, ReadyHandler>();
         builder.AddScoped<IEventsService, EventsService>();
         builder.AddScoped<IEmojiService, EmojiService>();
+        builder.AddSingleton<IRoombaService, RoombaService>();
     }
 }

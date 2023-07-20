@@ -3,12 +3,11 @@ using PinBot.Models;
 
 namespace PinBot;
 
-#pragma warning disable CS8618
-
 public class ApplicationContext : DbContext
 {
     private readonly AppConfig _config;
 
+#pragma warning disable CS8618
     public ApplicationContext(
         AppConfig config
     )
@@ -17,6 +16,8 @@ public class ApplicationContext : DbContext
     }
 
     public DbSet<EventChannel> EventChannels { get; set; }
+    public DbSet<ServerSettings> ServerSettings { get; set; }
+#pragma warning restore
 
     protected override void OnConfiguring(DbContextOptionsBuilder builder)
     {

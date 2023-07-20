@@ -4,18 +4,27 @@ namespace PinBot.Util;
 
 public static class TaskExtensions
 {
-    public static async Task<T> DeferIfNeeded<T>(
-        this Task<T> baseTask,
+    public static async Task DeferIfNeeded(
+        this Task baseTask,
         IDiscordInteraction interaction,
-        DateTimeOffset expiration,
+        DateTimeOffset? expiration = null,
         bool ephemeral = false
     )
     {
-        var delay = expiration - DateTimeOffset.UtcNow;
+        if (interaction.HasResponded)
+        {
+            await baseTask;
+            return;
+        }
+
+        var delay =
+            (expiration ?? interaction.CreatedAt.AddSeconds(2)) - DateTimeOffset.UtcNow;
+
         if (delay <= TimeSpan.Zero)
         {
             await interaction.DeferAsync(ephemeral);
-            return await baseTask;
+            await baseTask;
+            return;
         }
 
         using var source = new CancellationTokenSource();
@@ -33,13 +42,23 @@ public static class TaskExtensions
         });
         var baseAndCancelTask = Task.Run(async () =>
         {
-            var retval = await baseTask;
+            await baseTask;
             source.Cancel();
-            return retval;
         });
 
         await Task.WhenAll(baseAndCancelTask, deferTask);
 
-        return baseAndCancelTask.Result;
+        return;
+    }
+
+    public static async Task<T> DeferIfNeeded<T>(
+        this Task<T> baseTask,
+        IDiscordInteraction interaction,
+        DateTimeOffset? expiration = null,
+        bool ephemeral = false
+    )
+    {
+        await DeferIfNeeded((Task)baseTask, interaction, expiration, ephemeral);
+        return baseTask.Result;
     }
 }

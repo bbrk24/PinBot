@@ -30,12 +30,6 @@ public class EventsService : IEventsService
         Cacheable<IUserMessage, ulong> message,
         Cacheable<IMessageChannel, ulong> channel,
         SocketReaction reaction
-    ) => await HandleReaction(message, channel, reaction).ConfigureAwait(false);
-
-    private async Task HandleReaction(
-        Cacheable<IUserMessage, ulong> message,
-        Cacheable<IMessageChannel, ulong> channel,
-        SocketReaction reaction
     )
     {
         // The channel pool will be updated a lot less frequently than the message pool,
@@ -53,6 +47,8 @@ public class EventsService : IEventsService
         }
 
         // Check if it's the pin/unpin emoji
+        // TODO: I think this could be rewritten to make fewer database calls. Depends on
+        // what EF Core does under the hood. It may not matter.
         var shouldPin = await _emojiService.IsPinReaction(
             reaction.Emote,
             threadChannel.GuildId
@@ -86,7 +82,8 @@ public class EventsService : IEventsService
 
             try
             {
-                await userMessage.RemoveAllReactionsForEmoteAsync(reaction.Emote);
+                await userMessage.RemoveAllReactionsForEmoteAsync(reaction.Emote)
+                    .ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -107,7 +104,8 @@ public class EventsService : IEventsService
 
             try
             {
-                await userMessage.RemoveAllReactionsForEmoteAsync(reaction.Emote);
+                await userMessage.RemoveAllReactionsForEmoteAsync(reaction.Emote)
+                    .ConfigureAwait(false);
             }
             catch (Exception e)
             {
