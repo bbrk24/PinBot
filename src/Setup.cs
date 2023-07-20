@@ -81,7 +81,7 @@ public static class Setup
         builder.AddScoped<ICommandsService, CommandsService>();
         builder.AddScoped<IReadyHandler, ReadyHandler>();
         builder.AddScoped<IEventsService, EventsService>();
-        builder.AddScoped<IEmojiService, EmojiService>();
+        builder.AddScoped<ISettingsService, SettingsService>();
         builder.AddSingleton<IRoombaService, RoombaService>();
     }
 }

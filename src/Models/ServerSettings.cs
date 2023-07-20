@@ -1,5 +1,6 @@
 using DataOnion.db;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PinBot.Models;
 
@@ -20,6 +21,7 @@ public class ServerSettings : IEntity<long>
     [Unicode]
     public string UnpinEmoji { get; set; } = "🚫";
 
+    [Column(TypeName = "boolean")]
     public bool ForumsOnly { get; set; } = false;
 
     public override string ToString() => $@"Pin emoji: {PinEmoji}

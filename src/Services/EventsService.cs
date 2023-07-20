@@ -15,15 +15,15 @@ public interface IEventsService
 public class EventsService : IEventsService
 {
     private readonly ILogger _logger;
-    private readonly IEmojiService _emojiService;
+    private readonly ISettingsService _settingsService;
 
     public EventsService(
         ILogger<EventsService> logger,
-        IEmojiService emojiService
+        ISettingsService settingsService
     )
     {
         _logger = logger;
-        _emojiService = emojiService;
+        _settingsService = settingsService;
     }
 
     public async Task ReactionAdd(
@@ -34,14 +34,14 @@ public class EventsService : IEventsService
     {
         // The channel pool will be updated a lot less frequently than the message pool,
         // so this should usually already be there.
-        if (await channel.GetOrDownloadAsync() is not IThreadChannel threadChannel)
+        if (await channel.GetOrDownloadAsync() is not SocketThreadChannel threadChannel)
         {
             // Nothing to do here
             return;
         }
 
         // Check whether the person who reacted was the OP
-        if (reaction.UserId != threadChannel.OwnerId)
+        if (reaction.UserId != threadChannel.Owner.Id)
         {
             return;
         }
@@ -49,14 +49,23 @@ public class EventsService : IEventsService
         // Check if it's the pin/unpin emoji
         // TODO: I think this could be rewritten to make fewer database calls. Depends on
         // what EF Core does under the hood. It may not matter.
-        var shouldPin = await _emojiService.IsPinReaction(
+        var shouldPin = await _settingsService.IsPinReactionAsync(
             reaction.Emote,
-            threadChannel.GuildId
+            threadChannel.Guild.Id
         );
-        if (!(
-            shouldPin
-            || await _emojiService.IsUnpinReaction(reaction.Emote, threadChannel.GuildId)
-        ))
+        if (!(shouldPin || await _settingsService.IsUnpinReactionAsync(
+            reaction.Emote,
+            threadChannel.Guild.Id
+        )))
+        {
+            return;
+        }
+
+        // If the server only allows forums, check that
+        if (
+            threadChannel.ParentChannel is not IForumChannel
+            && await _settingsService.RequiresForumThreadsAsync(threadChannel.Guild.Id)
+        )
         {
             return;
         }
