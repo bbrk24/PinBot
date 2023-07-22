@@ -17,6 +17,7 @@ services.AddConfig();
 services.AddLogger();
 services.AddDatabase();
 services.AddRepositories();
+services.AddRoombas();
 services.AddGeneralServices();
 
 services.AddSingleton(client);
