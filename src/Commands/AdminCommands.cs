@@ -23,7 +23,7 @@ public class AdminCommands : InteractionModuleBase
         _repo = repo;
     }
 
-    [SlashCommand("setchannel", "Set the channel for an event.")]
+    [SlashCommand("setchannel", "Set the channel for an event")]
     public async Task SetChannelAsync(
         [Summary("event", "Which event to send")] EventName eventName,
         [ChannelTypes(ChannelType.Text, ChannelType.News)]
