@@ -93,7 +93,11 @@ public class ServerSettingsRepository : IServerSettingsRepository, IRoomba
     {
         await _dapperService.ExecuteAsync(
             @"DELETE FROM server_settings
-WHERE pin_emoji = @PinEmoji AND unpin_emoji = @UnpinEmoji AND forums_only = @ForumsOnly",
+WHERE
+    pin_emoji = @PinEmoji
+    AND unpin_emoji = @UnpinEmoji
+    AND forums_only = @ForumsOnly
+    AND ignore_bots = @IgnoreBots",
             new ServerSettings()
         );
     }
