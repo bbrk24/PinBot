@@ -148,5 +148,38 @@ public partial class SettingsCommand
                     : "Will now pin messages in all threads."
             );
         }
+
+        [SlashCommand("ignorebots", "Whether to ignore threads created by bots")]
+        public async Task SetIgnoreBotsAsync(
+            [Summary("value", "Whether to ignore threads created by bots")] bool value
+        )
+        {
+            try
+            {
+                await _repository.SetIgnoreBotsAsync(
+                    (long)Context.Guild.Id,
+                    value
+                ).DeferIfNeeded(Context.Interaction);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(
+                    e,
+                    "Exception while setting ignore bots mode for {0}",
+                    Context.Guild.Id
+                );
+                await Context.Interaction.RespondOrEditAsync(
+                    "An error occurred while saving.",
+                    ephemeral: true
+                );
+                return;
+            }
+
+            await Context.Interaction.RespondOrEditAsync(
+                value
+                    ? "Will no longer pin messages in threads created by bots."
+                    : "Will now pin messages in all threads."
+            );
+        }
     }
 }

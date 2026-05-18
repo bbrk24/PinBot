@@ -16,6 +16,7 @@ public interface IServerSettingsRepository
     Task UpdateAllEmojisAsync(long serverId, string emoji);
 
     Task SetForumsOnlyAsync(long serverId, bool forumsOnly);
+    Task SetIgnoreBotsAsync(long serverId, bool ignoreBots);
 }
 
 public class ServerSettingsRepository : IServerSettingsRepository, IRoomba
@@ -77,6 +78,14 @@ public class ServerSettingsRepository : IServerSettingsRepository, IRoomba
         await _efCoreService.UpsertAsync(
             serverId,
             (ServerSettings settings) => settings.ForumsOnly = forumsOnly
+        );
+    }
+
+    public async Task SetIgnoreBotsAsync(long serverId, bool ignoreBots)
+    {
+        await _efCoreService.UpsertAsync(
+            serverId,
+            (ServerSettings settings) => settings.IgnoreBots = ignoreBots
         );
     }
 

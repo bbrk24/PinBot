@@ -1,5 +1,6 @@
 using Discord;
 using Discord.WebSocket;
+using PinBot.Repositories;
 
 namespace PinBot.Services;
 
@@ -15,15 +16,12 @@ public interface IEventsService
 public class EventsService : IEventsService
 {
     private readonly ILogger _logger;
-    private readonly ISettingsService _settingsService;
+    private readonly IServerSettingsRepository _settingsRepo;
 
-    public EventsService(
-        ILogger<EventsService> logger,
-        ISettingsService settingsService
-    )
+    public EventsService(ILogger<EventsService> logger, IServerSettingsRepository settingsRepo)
     {
         _logger = logger;
-        _settingsService = settingsService;
+        _settingsRepo = settingsRepo;
     }
 
     public async Task ReactionAdd(
@@ -46,26 +44,24 @@ public class EventsService : IEventsService
             return;
         }
 
+        var settings = await _settingsRepo.GetSettingsAsync((long)threadChannel.Guild.Id);
+
         // Check if it's the pin/unpin emoji
-        // TODO: I think this could be rewritten to make fewer database calls. Depends on
-        // what EF Core does under the hood. It may not matter.
-        var shouldPin = await _settingsService.IsPinReactionAsync(
-            reaction.Emote,
-            threadChannel.Guild.Id
-        );
-        if (!(shouldPin || await _settingsService.IsUnpinReactionAsync(
-            reaction.Emote,
-            threadChannel.Guild.Id
-        )))
+        var shouldPin = settings.PinEmoji == reaction.Emote.ToString();
+        var shouldUnpin = settings.UnpinEmoji == reaction.Emote.ToString();
+        if (!(shouldPin || shouldUnpin))
         {
             return;
         }
 
         // If the server only allows forums, check that
-        if (
-            threadChannel.ParentChannel is not IForumChannel
-            && await _settingsService.RequiresForumThreadsAsync(threadChannel.Guild.Id)
-        )
+        if (threadChannel.ParentChannel is not IForumChannel && settings.ForumsOnly)
+        {
+            return;
+        }
+
+        // If the server says to ignore bots, do so
+        if (settings.IgnoreBots && threadChannel.Owner.IsBot)
         {
             return;
         }

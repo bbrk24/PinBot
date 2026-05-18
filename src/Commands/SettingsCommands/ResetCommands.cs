@@ -103,6 +103,33 @@ public partial class SettingsCommand
             await Context.Interaction.RespondOrEditAsync("Forums-only mode reset!");
         }
 
+        [SlashCommand("ignorebots", "Whether to ignore threads created by bots")]
+        public async Task ResetIgnoreBotsAsync()
+        {
+            try
+            {
+                await _repository.SetIgnoreBotsAsync(
+                    (long)Context.Guild.Id,
+                    new ServerSettings().IgnoreBots
+                ).DeferIfNeeded(Context.Interaction);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(
+                    e,
+                    "Exception occurred while setting ignore bots mode for {0}",
+                    Context.Guild.Id
+                );
+                await Context.Interaction.RespondOrEditAsync(
+                    "An unexpected error occurred while saving.",
+                    ephemeral: true
+                );
+                return;
+            }
+
+            await Context.Interaction.RespondOrEditAsync("Ignore bots mode reset!");
+        }
+
         [SlashCommand("all", "Reset all settings")]
         public async Task ResetAllAsync()
         {
